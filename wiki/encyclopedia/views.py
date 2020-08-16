@@ -1,7 +1,8 @@
 from django.shortcuts import render
+from django.shortcuts import redirect
 from . import util
 import markdown2
-
+import random
 from . import util
 
 
@@ -21,3 +22,7 @@ def lookup(request, entry):
         "entry_name": entry,
         "entry_content": entry_content
     })
+
+def random_page(request):
+    entry = random.choice(util.list_entries())
+    return redirect('encyclopedia:lookup', entry=entry)
