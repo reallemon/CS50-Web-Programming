@@ -25,4 +25,16 @@ def lookup(request, entry):
 
 def random_page(request):
     entry = random.choice(util.list_entries())
-    return redirect('encyclopedia:lookup', entry=entry)
+    return redirect("encyclopedia:lookup", entry=entry)
+
+def search(request):
+    query = request.GET['q']
+    entries = util.list_entries()
+    if query.lower() in [lower_entry.lower() for lower_entry in entries]:
+        return redirect("encyclopedia:lookup", entry=query)
+    else:
+        search_results = [entry for entry in entries if query.lower() in entry.lower()]
+        return render(request, "encyclopedia/search.html", {
+            "query":query,
+            "search_results":search_results
+        })
