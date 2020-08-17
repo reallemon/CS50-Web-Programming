@@ -91,11 +91,6 @@ def edit(request, entry):
             form_title = form.cleaned_data["title"]
             util.save_entry(form_title, form.cleaned_data["body"])
             return redirect("encyclopedia:lookup", entry=form_title)
-        # if form.is_valid():
-        #     form_title = form.cleaned_data["title"]
-        #     with open(f"entries/{form_title}.md", "w") as file:
-        #         file.write(form.cleaned_data["body"])
-        #     return redirect("encyclopedia:lookup", entry=form_title)
         else:
             return render(request, "encyclopedia/edit.html", {
                 "form": form,
