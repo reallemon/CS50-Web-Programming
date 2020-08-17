@@ -19,6 +19,15 @@ class NewArticleForm(forms.Form):
 
         return data
 
+class EditArticle(forms.Form):
+    title = forms.CharField(widget=forms.TextInput(
+        attrs={"class": "form-control", "id": "newTitle"}))
+    body = forms.CharField(widget=forms.Textarea(
+        attrs={"rows": "10", "class": "form-control", "id": "newBody"}))
+    
+    def clean_body(self):
+        return self.cleaned_data.get("body")
+
 def index(request):
     return render(request, "encyclopedia/index.html", {
         "entries": util.list_entries()
@@ -67,3 +76,28 @@ def new(request):
         return render(request, "encyclopedia/new.html", {
             "form": NewArticleForm()
         })
+
+def edit(request, entry):
+    if request.method == "GET":
+        form = EditArticle(initial={"title": entry, "body": util.get_entry(entry)})
+        
+        return render(request, "encyclopedia/edit.html", {
+            "form": form,
+            "entry": entry
+        })
+    else:
+        form = EditArticle(request.POST)
+        if form.is_valid():
+            form_title = form.cleaned_data["title"]
+            util.save_entry(form_title, form.cleaned_data["body"])
+            return redirect("encyclopedia:lookup", entry=form_title)
+        # if form.is_valid():
+        #     form_title = form.cleaned_data["title"]
+        #     with open(f"entries/{form_title}.md", "w") as file:
+        #         file.write(form.cleaned_data["body"])
+        #     return redirect("encyclopedia:lookup", entry=form_title)
+        else:
+            return render(request, "encyclopedia/edit.html", {
+                "form": form,
+                "entry": entry
+            })
