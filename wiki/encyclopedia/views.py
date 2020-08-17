@@ -1,16 +1,28 @@
 from django.shortcuts import render
 from django.shortcuts import redirect
+from django import forms
 from . import util
 import markdown2
 import random
 from . import util
 
+class NewArticleForm(forms.Form):
+    title = forms.CharField(widget=forms.TextInput(attrs={"class":"form-control", "id":"newTitle"}))
+    body = forms.CharField(widget=forms.Textarea(attrs={"rows":"10", "class":"form-control", "id":"newBody"}))
+
+    def clean_title(self):
+        data = self.cleaned_data.get("title")
+        entries = util.list_entries()
+
+        if data.lower() in [entry.lower() for entry in entries]:
+            raise forms.ValidationError("That article already exists")
+
+        return data
 
 def index(request):
     return render(request, "encyclopedia/index.html", {
         "entries": util.list_entries()
     })
-
 
 def lookup(request, entry):
     entry_content = util.get_entry(entry)
@@ -37,4 +49,21 @@ def search(request):
         return render(request, "encyclopedia/search.html", {
             "query":query,
             "search_results":search_results
+        })
+
+def new(request):
+    if request.method == "POST":
+        form = NewArticleForm(request.POST)
+        if form.is_valid():
+            form_title = form.cleaned_data["title"]
+            with open(f"entries/{form_title}.md", "w") as file:
+                file.write(form.cleaned_data["body"])
+            return redirect("encyclopedia:lookup", entry=form_title)
+        else:
+            return render(request, "encyclopedia/new.html", {
+                "form": form
+            })
+    else:
+        return render(request, "encyclopedia/new.html", {
+            "form": NewArticleForm()
         })
