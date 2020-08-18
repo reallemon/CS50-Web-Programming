@@ -117,3 +117,23 @@ def close_listing(request, pk):
             listing.closed = True
             listing.save()
     return HttpResponseRedirect(reverse("listing", args=[pk]))
+
+@login_required
+def new_listing(request):
+    if request.method == "POST":
+        listing = Listing()
+        listing.title = request.POST["title"]
+        listing.description = request.POST["description"]
+        listing.starting_bid = request.POST["startingBid"]
+        listing.user = request.user
+        listing.image_url = request.POST["imageUrl"]
+        listing.category = request.POST["category"]
+        listing.closed = False
+        listing.save()
+        return HttpResponseRedirect(reverse("index"))
+    else:
+        return render(request, "auctions/new.html")
+
+@login_required
+def display_watchlist(request):
+    return render(request, "auctions/watchlist.html")

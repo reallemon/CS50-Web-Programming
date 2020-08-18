@@ -20,6 +20,14 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'index' %}">Active Listings</a>
                         </li>
+                        <li class="nav-item">
+                            <a href="{% url 'new' %}" class="nav-link">Create Listing</a>
+                        </li>
+                        {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a href="{% url 'watchlist' %}" class="nav-link">Watchlist</a>
+                        </li>
+                        {% endif %}
                     </ul>
                 </div>
                 {% if user.is_authenticated %}
