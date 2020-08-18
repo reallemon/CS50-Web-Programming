@@ -41,6 +41,8 @@ class Listing(models.Model):
     category = models.CharField(blank=True, max_length=2, choices=CATEGORY_CHOICES)
     watchlist = models.ManyToManyField(
         User, blank=True, related_name="watchlist")
+    closed = models.BooleanField(default="False")
+    
     def __str__(self):
         return str(self.title)
 

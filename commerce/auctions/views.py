@@ -1,4 +1,5 @@
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
@@ -8,7 +9,7 @@ from .models import User, Comment, Listing, Bid
 
 
 def index(request):
-    listings = Listing.objects.all()
+    listings = Listing.objects.exclude(closed=True).all()
     return render(request, "auctions/index.html", {
         "listings": listings
     })
@@ -64,3 +65,55 @@ def register(request):
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "auctions/register.html")
+
+
+def listing_lookup(request, pk):
+    listing = Listing.objects.get(pk=pk)
+    return render(request, "auctions/listing.html", {
+        "listing": listing
+    })
+
+@login_required
+def watch(request, pk):
+    if request.method == "POST":
+        listing = Listing.objects.get(pk=pk)
+        if listing in request.user.watchlist.all():
+            request.user.watchlist.remove(listing)
+        else:
+            request.user.watchlist.add(listing)
+    return HttpResponseRedirect(reverse("listing", args=[pk]))
+
+@login_required
+def place_bid(request, pk):
+    if request.method == "POST":
+        listing = Listing.objects.get(pk=pk)
+        new_bid = float(request.POST["new_bid"])
+        current_bid = listing.bids.last().amount if listing.bids.last() else float(listing.starting_bid) - .01
+        if new_bid > current_bid:
+            new_bid = Bid(user=request.user, listing=listing, amount=new_bid)
+            new_bid.save()
+            listing.bids.add(new_bid)
+        else:
+            return render(request, "auctions/listing.html", {
+                "listing": listing,
+                "message": "You can't place a lower bid"
+            })
+    return HttpResponseRedirect(reverse("listing", args=[pk]))
+
+@login_required
+def place_comment(request, pk):
+    if request.method == "POST":
+        listing = Listing.objects.get(pk=pk)
+        new_comment = str(request.POST["new_comment"])
+        new_comment = Comment(user=request.user, listing=listing, text=new_comment)
+        new_comment.save()
+    return HttpResponseRedirect(reverse("listing", args=[pk]))
+
+@login_required
+def close_listing(request, pk):
+    if request.method == "POST":
+        listing = Listing.objects.get(pk=pk)
+        if listing.user == request.user and not listing.closed:
+            listing.closed = True
+            listing.save()
+    return HttpResponseRedirect(reverse("listing", args=[pk]))
