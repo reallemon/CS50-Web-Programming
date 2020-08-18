@@ -1,7 +1,7 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-    <h2>Active Listings</h2>
+    <h2>{{ category }}</h2>
 
     {% for listing in listings %}
         <div class="card mb-3" style="max-width: 540px;">
@@ -16,7 +16,7 @@
                         {% if listing.bids.last %}
                             ${{ listing.bids.last.amount }} bid by {{ listing.bids.last.user }}
                         {% else %}
-                            Starting bid: ${{ listing.starting_bid }}
+                            No bids
                         {% endif %}
                         </h6>
                         <p class="card-text">{{ listing.description }}</p>
@@ -28,6 +28,8 @@
                 <a href="{% url 'listing' listing.pk %}" class="stretched-link">View Listing</a>
             </div>
         </div>
+    {% empty %}
+        No listings in this category
     {% endfor %}
 
 

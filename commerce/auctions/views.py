@@ -96,7 +96,7 @@ def place_bid(request, pk):
         else:
             return render(request, "auctions/listing.html", {
                 "listing": listing,
-                "message": "You can't place a lower bid"
+                "message": "Bid too low"
             })
     return HttpResponseRedirect(reverse("listing", args=[pk]))
 
@@ -137,3 +137,14 @@ def new_listing(request):
 @login_required
 def display_watchlist(request):
     return render(request, "auctions/watchlist.html")
+
+def display_categories(request):
+    return render(request, "auctions/categories.html", {
+        "categories": Listing._meta.get_field("category").choices
+    })
+
+def display_category(request, code):
+    return render(request, "auctions/category.html", {
+        "category": dict(Listing._meta.get_field("category").choices)[code],
+        "listings": Listing.objects.filter(category=code).all().exclude(closed=True).all()
+    })
