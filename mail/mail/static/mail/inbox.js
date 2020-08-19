@@ -20,6 +20,24 @@ function compose_email() {
   document.querySelector('#compose-recipients').value = '';
   document.querySelector('#compose-subject').value = '';
   document.querySelector('#compose-body').value = '';
+
+  document.querySelector('#compose-form').onsubmit = () => {
+    fetch('/emails', {
+      method: 'POST',
+      body: JSON.stringify({
+        recipients: document.querySelector('#compose-recipients'),
+        subject: document.querySelector('#compose-subject'),
+        body: document.querySelector('#compose-body')
+      })
+    })
+    .then(response => response.json())
+    .then(result => {
+      alert(result[1]);
+    });
+
+    // Stop from from submitting
+    return false;
+  }
 }
 
 function load_mailbox(mailbox) {
@@ -36,9 +54,12 @@ function load_mailbox(mailbox) {
   .then(response => response.json())
   .then(emails => {
     emails.foreach( email => {
+      // Style emails as a Bootstrap list group
       const emailLink = document.createElement('a');
       const emailClasses = ['list-group-item', 'list-group-item-action'];
       emailLink.classList.add(...emailClasses);
+      
+      // Just display the email subject for now
       emailLink.innerHTML = email.subject;
       document.querySelector('#emails-list').append(emailLink);
     })
