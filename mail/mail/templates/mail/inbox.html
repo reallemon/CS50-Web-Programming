@@ -27,21 +27,24 @@
                 <b>From: </b><span id="email-sender"></span>
             </div>
             <div class="col-sm-2 offset-sm-4">
-                <small><span id="email-timestamp"></span></small>
+                <p><small><span id="email-timestamp"></span></small></p>
             </div>
         </div>
         <div class="row">
             <div class="col-md-6">
                 <b>To: </b><span id="email-recipients"></span>
             </div>
+            <div class="col-sm-2 offset-sm-4">
+                <button class="btn btn-secondary btn-sm" id="archive-button"></button>
+            </div>
         </div>
         <hr>
         <div class="row">
-            <div class="col-md-10">
-                <span id="email-body"></span>
+            <div class="col-md-10" id="email-body">
             </div>
         </div>
-        <button class="btn btn-secondary" id=archive-button></button>
+        <hr>
+        <button class="btn btn-success" id="reply-button">Reply</button>
     </div>
 
     <div id="compose-view">
