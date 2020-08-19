@@ -12,7 +12,7 @@
     <hr>
 
     <div id="emails-view">
-        <div class="list-group emails-list">
+        <div class="list-group" id="emails-list">
         </div>
     </div>
 
@@ -23,6 +23,7 @@
                 From: <input disabled class="form-control" value="{{ request.user.email }}">
             </div>
             <div class="form-group">
+                <span class="alert alert-danger" style="display:none" id="recipients-message"></span>
                 To: <input id="compose-recipients" class="form-control">
             </div>
             <div class="form-group">

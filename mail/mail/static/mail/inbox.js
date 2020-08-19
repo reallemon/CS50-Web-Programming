@@ -25,14 +25,20 @@ function compose_email() {
     fetch('/emails', {
       method: 'POST',
       body: JSON.stringify({
-        recipients: document.querySelector('#compose-recipients'),
-        subject: document.querySelector('#compose-subject'),
-        body: document.querySelector('#compose-body')
+        recipients: document.querySelector('#compose-recipients').value,
+        subject: document.querySelector('#compose-subject').value,
+        body: document.querySelector('#compose-body').value
       })
     })
     .then(response => response.json())
     .then(result => {
-      alert(result[1]);
+      if (result['error']){
+        message = document.querySelector('#recipients-message');
+        message.style.display = 'block';
+        message.innerHTML = result['error'];
+      } else {
+        load_mailbox('sent');
+      }
     });
 
     // Stop from from submitting
@@ -53,7 +59,7 @@ function load_mailbox(mailbox) {
   fetch(`/emails/${mailbox}`)
   .then(response => response.json())
   .then(emails => {
-    emails.foreach( email => {
+    emails.forEach( email => {
       // Style emails as a Bootstrap list group
       const emailLink = document.createElement('a');
       const emailClasses = ['list-group-item', 'list-group-item-action'];
