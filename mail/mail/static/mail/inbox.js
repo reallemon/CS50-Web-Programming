@@ -30,4 +30,17 @@ function load_mailbox(mailbox) {
 
   // Show the mailbox name
   document.querySelector('#emails-view').innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
+
+  // Request emails for mailbox
+  fetch(`/emails/${mailbox}`)
+  .then(response => response.json())
+  .then(emails => {
+    emails.foreach( email => {
+      const emailLink = document.createElement('a');
+      const emailClasses = ['list-group-item', 'list-group-item-action'];
+      emailLink.classList.add(...emailClasses);
+      emailLink.innerHTML = email.subject;
+      document.querySelector('#emails-list').append(emailLink);
+    })
+  })
 }
