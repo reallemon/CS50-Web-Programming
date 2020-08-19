@@ -68,17 +68,19 @@ function load_mailbox(mailbox) {
     emails.forEach( email => {
       // Style emails as a Bootstrap list group
       const emailLink = document.createElement('button');
-      const emailClasses = ['list-group-item', 'list-group-item-action'];
-      emailLink.classList.add(...emailClasses);
+      const readClass = email.read ? 'bg-light' : 'bg-white'
+      emailLink.classList.add(...['list-group-item', 'list-group-item-action', readClass]);
       emailLink.id = `email-link-${email.id}`
-      // emailLink.onclick = loadEmail(email.id);
+      emailLink.onclick = function() {
+        loadEmail(email.id);
+      }
       
       // Display emails
       document.querySelector('#emails-list').append(emailLink);
 
       // Create area for email info to display
       const emailInfo = document.createElement('ul')
-      emailInfo.classList.add(...['list-group', 'list-group-horizontal'])
+      emailInfo.classList.add(...['list-group', 'list-group-horizontal', readClass])
       emailInfo.id = `email-info-group-${email.id}`
       document.querySelector(`#email-link-${email.id}`).append(emailInfo)
 
@@ -88,11 +90,21 @@ function load_mailbox(mailbox) {
                      `<b>Sent at:</b> ${email.timestamp}`]
       displayInfo.forEach( info => {
         const infoItem = document.createElement('li');
-        infoItem.classList.add(...['list-group-item', 'flex-fill', 'border-0']);
+        infoItem.classList.add(...['list-group-item', 'flex-fill', 'border-0', readClass]);
         infoItem.innerHTML = info;
         document.querySelector(`#email-info-group-${email.id}`).append(infoItem)
       })
 
     })
   })
+}
+
+function loadEmail(id) {
+  fetch(`/emails/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify({
+      read: true
+    })
+  })
+  
 }
