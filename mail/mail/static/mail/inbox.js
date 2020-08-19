@@ -114,13 +114,15 @@ function loadEmail(id) {
       document.querySelector('#emails-view').style.display = 'none';
       document.querySelector('#email-view').style.display = 'block';
 
-      // Mark email as read
-      fetch(`/emails/${id}`, {
-        method: 'PUT',
-        body: JSON.stringify({
-          read: true
+      // Mark email as read unless read
+      if (!email.read) {
+        fetch(`/emails/${id}`, {
+          method: 'PUT',
+          body: JSON.stringify({
+            read: true
+          })
         })
-      })
+      }
 
       // Display email
       console.log(email)
@@ -129,6 +131,21 @@ function loadEmail(id) {
       document.querySelector('#email-subject').innerHTML = email.subject;
       document.querySelector('#email-body').innerHTML = email.body;
       document.querySelector('#email-timestamp').innerHTML = email.timestamp;
+
+      // Ready archive button
+      archiveButton = document.querySelector('#archive-button');
+      archiveButton.innertHTML = email.archived ? 'Unarchive' : 'Archive';
+      archiveButton.addEventListener('click', () => unarchive(email.id, email.archived));
     }
   })
+}
+
+function unarchive(id, archived) {
+  fetch(`/emails/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify({
+      archived: !archived
+    })
+  })
+  load_mailbox(inbox);
 }
