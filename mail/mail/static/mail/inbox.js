@@ -134,7 +134,7 @@ function loadEmail(id) {
 
       // Ready archive button
       archiveButton = document.querySelector('#archive-button');
-      archiveButton.innertHTML = email.archived ? 'Unarchive' : 'Archive';
+      archiveButton.innerHTML = email.archived ? 'Unarchive' : 'Archive';
       archiveButton.addEventListener('click', () => unarchive(email.id, email.archived));
     }
   })
