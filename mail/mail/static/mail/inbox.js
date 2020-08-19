@@ -47,13 +47,19 @@ function compose_email() {
 }
 
 function load_mailbox(mailbox) {
-  
+  emailsView = document.querySelector('#emails-view')
   // Show the mailbox and hide other views
-  document.querySelector('#emails-view').style.display = 'block';
+  emailsView.style.display = 'block';
   document.querySelector('#compose-view').style.display = 'none';
 
   // Show the mailbox name
-  document.querySelector('#emails-view').innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
+  emailsView.innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
+
+  // Add div for emails
+  const emailGroup = document.createElement('div');
+  emailGroup.classList.add('list-group')
+  emailGroup.id = 'emails-list'
+  emailsView.append(emailGroup)
 
   // Request emails for mailbox
   fetch(`/emails/${mailbox}`)
@@ -61,13 +67,32 @@ function load_mailbox(mailbox) {
   .then(emails => {
     emails.forEach( email => {
       // Style emails as a Bootstrap list group
-      const emailLink = document.createElement('a');
+      const emailLink = document.createElement('button');
       const emailClasses = ['list-group-item', 'list-group-item-action'];
       emailLink.classList.add(...emailClasses);
+      emailLink.id = `email-link-${email.id}`
+      // emailLink.onclick = loadEmail(email.id);
       
-      // Just display the email subject for now
-      emailLink.innerHTML = email.subject;
+      // Display emails
       document.querySelector('#emails-list').append(emailLink);
+
+      // Create area for email info to display
+      const emailInfo = document.createElement('ul')
+      emailInfo.classList.add(...['list-group', 'list-group-horizontal'])
+      emailInfo.id = `email-info-group-${email.id}`
+      document.querySelector(`#email-link-${email.id}`).append(emailInfo)
+
+      // Gather info to display
+      displayInfo = [`<b>From:</b> ${email.sender}`,
+                     `<b>Subject:</b> ${email.subject}`,
+                     `<b>Sent at:</b> ${email.timestamp}`]
+      displayInfo.forEach( info => {
+        const infoItem = document.createElement('li');
+        infoItem.classList.add(...['list-group-item', 'flex-fill', 'border-0']);
+        infoItem.innerHTML = info;
+        document.querySelector(`#email-info-group-${email.id}`).append(infoItem)
+      })
+
     })
   })
 }
