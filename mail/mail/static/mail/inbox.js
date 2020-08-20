@@ -5,8 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
   document.querySelector('#sent').addEventListener('click', () => load_mailbox('sent'));
   document.querySelector('#archived').addEventListener('click', () => load_mailbox('archive'));
   document.querySelector('#compose').addEventListener('click', () => compose_email());
-  // Set up reply button
-  document.querySelector('#reply-button').addEventListener('click', () => compose_email(email))
+  
   // By default, load the inbox
   load_mailbox('inbox');
 });
@@ -149,6 +148,9 @@ function loadEmail(id) {
       archiveButton = document.querySelector('#archive-button');
       archiveButton.innerHTML = email.archived ? 'Unarchive' : 'Archive';
       archiveButton.onclick = () => toggleArchive(email.id, email.archived);
+
+      // Set up reply button
+      document.querySelector('#reply-button').onclick = () => compose_email(email)
     }
   })
 }
