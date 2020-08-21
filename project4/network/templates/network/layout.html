@@ -41,7 +41,7 @@
             </div>
           </nav>
         
-        <div class="body">
+        <div class="body container">
             {% block body %}
             {% endblock %}
         </div>
@@ -53,5 +53,7 @@
         <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
         <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
         <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+        {% block script %}
+        {% endblock %}
     </body>
 </html>

@@ -1,10 +1,13 @@
+import json
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
+from django.http import JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import User
+from .models import User, Post
 
 
 def index(request):
@@ -61,3 +64,22 @@ def register(request):
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "network/register.html")
+
+@login_required
+def new_post(request):
+    # Must make a new post via POST
+    if request.method != "POST":
+            return JsonResponse({"error": "POST request required."}, status=400)
+    
+    # Get post data as JSON
+    data = json.loads(request.body)
+
+    # Validate post text
+    if len(data.get("text").strip()) == 0:
+        return JsonResponse({ "error": "Post must contain text."}, status=400)
+
+    # Create new post
+    post = Post(user = request.user, text = data.get("text"))
+    post.save()
+
+    return JsonResponse({"message": "Post was successful"}, status=201)
