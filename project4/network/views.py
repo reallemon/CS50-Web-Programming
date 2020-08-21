@@ -1,4 +1,6 @@
 import json
+import time
+
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
@@ -83,3 +85,8 @@ def new_post(request):
     post.save()
 
     return JsonResponse({"message": "Post was successful"}, status=201)
+
+def display_posts(request):
+    time.sleep(.1)
+    posts = Post.objects.all().order_by("-timestamp").all()
+    return JsonResponse([post.serialize() for post in posts], safe=False)

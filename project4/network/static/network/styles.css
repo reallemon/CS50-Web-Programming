@@ -29,8 +29,35 @@
     }
 }
 
+@keyframes show {
+    0% {
+        opacity: 0;
+        height: 0px;
+        line-height: 0px;
+        margin-bottom: 20px;
+        font-size: 0px;
+    }
+    100% {
+        opacity: 1;
+        height: 100%;
+        line-height: 100%;
+        margin-bottom: 20px;
+        font-size: 100%;
+    }
+}
+
 .alert-hide {
     animation-name: hide;
     animation-duration: 5s;
+    animation-fill-mode: forwards;
+}
+
+.hearts {
+    color: red;
+}
+
+.fade-in {
+    animation-name: show;
+    animation-duration: 1s;
     animation-fill-mode: forwards;
 }

@@ -13,12 +13,15 @@ class App extends React.Component {
 
     render() {
         return (
-            <NewPost />
+            <div>
+                <Post />
+
+            </div>
         )
     };
 }
 
-class NewPost extends React.Component {
+class Post extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -26,25 +29,62 @@ class NewPost extends React.Component {
             message: '',
             helpText: '',
             messageClass: '',
-            placeholder: ''
+            placeholder: '',
+            posts: []
         }
+
+        // Load existing posts
+        this.getNewPosts = this.getNewPosts.bind(this);
+        this.getNewPosts()
     };
 
     render() {
         return (
-            <div className="row">
-                <div className="col-sm-12">
-                    <form onSubmit={this.submitHandler}>
-                        <div className="form-group">
-                            <div className={this.state.messageClass} role="alert">{this.state.message}</div>
-                            <textarea className='form-control' value={this.state.text} onChange={this.updateText} onKeyPress={this.inputKeyPress} aria-describedby="newPostHelp" placeholder='New post...' />
-                            <small id="newPostHelp" className="form-text text-muted">{this.state.helpText}</small>
-                        </div>
-                    </form>
+            <div>
+                <div className="row">
+                    <div className="col-sm-12">
+                        <form onSubmit={this.submitHandler}>
+                            <div className="form-group pt-3">
+                                <div className={this.state.messageClass} role="alert">{this.state.message}</div>
+                                <textarea className='form-control rounded-pill' value={this.state.text} onChange={this.updateText} onKeyPress={this.inputKeyPress} aria-describedby="newPostHelp" placeholder='New post...' />
+                                <small id="newPostHelp" className="form-text text-muted">{this.state.helpText}</small>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div className="row">
+                    <div className="col-sm-12">
+                        <ul className="list-group">
+                            {this.state.posts.map( post => (
+                                <li key={post.id} className="list-group-item mb-2 border rounded-pill fade-in">
+                                    <div className="ml-5">
+                                        <h2>{post.user}</h2>
+                                        <small>Edit</small>
+                                        <p className="pb-1">{post.text}</p>
+                                        <p><small className="text-muted">{post.timestamp}</small></p>
+                                        {this.likeOrNot(post.likes)} {post.likes.length}
+                                    </div>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
                 </div>
             </div>
         )
     };
+
+     likeOrNot(likes){
+         const likesObject = Object.fromEntries(likes);
+         if (Object.values(likesObject).includes(parseInt(window.django.user.id))) {
+             return (
+                 <span className="hearts">&#9825;</span>
+                 )
+         } else {
+             return ( 
+                 <span className="hearts">&hearts;</span>
+                 );
+        }
+     }
 
     // Update input field as the user types
     updateText = (event) => {
@@ -103,7 +143,14 @@ class NewPost extends React.Component {
             this.setState(state => ({
                 text: ''
             }))
+            this.getNewPosts();
         }
+    }
+
+    getNewPosts() {
+        fetch('/posts')
+            .then(response => response.json())
+            .then(posts => this.setState({ posts: posts }))
     }
 }
 
