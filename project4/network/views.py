@@ -90,3 +90,14 @@ def display_posts(request):
     time.sleep(.1)
     posts = Post.objects.all().order_by("-timestamp").all()
     return JsonResponse([post.serialize() for post in posts], safe=False)
+
+def like_post(request, post_id):
+    post = Post.objects.get(pk=post_id)
+    if request.method == "PUT":
+        data = json.load(request.body)
+        if data.get("liked") == "true":
+            post.likes.add(request.user)
+        elif data.get("liked") == "false":
+            post.likes.remove(request.user)
+        post.save()
+        return HttpResponse(status=204)
