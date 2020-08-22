@@ -99,7 +99,9 @@ class Post extends React.Component {
                 <p>
                   <small className="text-muted">{post.timestamp}</small>
                 </p>
-                {this.likeOrNot(post.likes)} {post.likes.length}
+                <a href="#!" onClick={ () => this.likePost(post.id)}>
+                  {this.likeOrNot(post.likes)} {post.likes.length}
+                </a>
               </div>
             </li>
           ))}
@@ -127,6 +129,19 @@ class Post extends React.Component {
         </nav>
       </div>
     );
+  }
+
+  likePost(id) {
+    fetch(`posts/${id}`, {
+      method: "PUT",
+      headers: {
+        "X-CSRFToken": window.django.csrf,
+      },
+      body: JSON.stringify({
+        liked: "toggle",
+      }),
+    });
+    this.getNewPosts()
   }
 
   isFirstPage() {
@@ -175,9 +190,9 @@ class Post extends React.Component {
   likeOrNot(likes) {
     const likesObject = Object.fromEntries(likes);
     if (Object.values(likesObject).includes(parseInt(window.django.user.id))) {
-      return <span className="hearts">&#9825;</span>;
+        return <span className="hearts">&hearts;</span>;
     } else {
-      return <span className="hearts">&hearts;</span>;
+        return <span className="hearts">&#9825;</span>;
     }
   }
 

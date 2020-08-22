@@ -55,6 +55,7 @@
         <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
         <script>
             window.django = {
+                csrf: "{{ csrf_token }}",
                 user: {
                     username: "{{ request.user.username }}",
                     id: "{{ request.user.id }}"
