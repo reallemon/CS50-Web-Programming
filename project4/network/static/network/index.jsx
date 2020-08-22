@@ -93,8 +93,8 @@ class Post extends React.Component {
               className="list-group-item mb-2 border rounded-pill fade-in"
             >
               <div className="ml-5">
-                <h2>{post.user}</h2>
-                <small>Edit</small>
+                <h2>{post.user.username}</h2>
+                {this.canEdit(post.user.id)}
                 <p className="pb-1">{post.text}</p>
                 <p>
                   <small className="text-muted">{post.timestamp}</small>
@@ -129,6 +129,14 @@ class Post extends React.Component {
         </nav>
       </div>
     );
+  }
+
+  canEdit(postUserId) {
+      if(postUserId === parseInt(window.django.user.id)) {
+          return(
+              <small>Edit</small>
+          )
+      }
   }
 
   likePost(id) {

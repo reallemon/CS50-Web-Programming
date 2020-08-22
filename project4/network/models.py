@@ -18,7 +18,7 @@ class Post(models.Model):
         return {
             "id": self.id,
             "timestamp": self.timestamp.strftime("%b %d %Y, %I:%M %p"),
-            "user": self.user.username,
+            "user": {"username": self.user.username, "id": self.user.id},
             "text": self.text,
             "likes": likes
         }
