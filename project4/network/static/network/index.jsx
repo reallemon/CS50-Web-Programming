@@ -102,7 +102,14 @@ class Post extends React.Component {
               className="list-group-item mb-2 border rounded-pill fade-in"
             >
               <div className="ml-5">
-                <h2>{post.user.username}</h2>
+                <h2>
+                  <a
+                    href="#!"
+                    onClick={() => this.changeUserView(post.user.id)}
+                  >
+                    {post.user.username}
+                  </a>
+                </h2>
                 {this.postText(post)}
                 <p>
                   <small className="text-muted">{post.timestamp}</small>
@@ -137,6 +144,12 @@ class Post extends React.Component {
         </nav>
       </div>
     );
+  }
+
+  changeUserView(id) {
+      this.setState({
+          userView: id
+      });
   }
 
   postText(post) {
