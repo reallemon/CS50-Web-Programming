@@ -58,9 +58,7 @@
                 csrf: "{{ csrf_token }}",
                 user: {
                     username: "{{ request.user.username }}",
-                    id: "{{ request.user.id }}",
-                    following: {{ request.user.following.count }},
-                    followers: {{ request.user.followers.count }}
+                    id: "{{ request.user.id }}"
                 }
             };
         </script>

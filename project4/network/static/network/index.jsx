@@ -31,6 +31,7 @@ class Post extends React.Component {
       postsPerPage: 10,
       userView: -1,
       userViewName: null,
+      userViewUser: null,
     };
 
     // Load existing posts
@@ -52,23 +53,32 @@ class Post extends React.Component {
 
   profilePage() {
     if (this.state.userView != -1 && this.state.userViewName) {
-      return (
-        <div>
-          <div className="row">
-            <div className="col-sm-12">
-              <h1>{this.state.userViewName}</h1>
+      if (!this.state.userViewUser) {
+        this.getProfilePage;
+        return <div>Loading...</div>;
+      } else {
+        return (
+          <div>
+            <div className="row">
+              <div className="col-sm-12">
+                <h1>{this.state.userViewName}</h1>
+              </div>
+            </div>
+            <div className="row">
+              <div className="col-sm-6">
+                <small>
+                  {this.state.userViewUser.followers.length} followers
+                </small>
+              </div>
+              <div className="col-sm-6">
+                <small>
+                  Following {this.state.userViewUser.following} people.
+                </small>
+              </div>
             </div>
           </div>
-          <div className="row">
-            <div className="col-sm-6">
-              <small>{window.django.user.followers} followers</small>
-            </div>
-            <div className="col-sm-6">
-              <small>Following {window.django.user.following} people.</small>
-            </div>
-          </div>
-        </div>
-      );
+        );
+      }
     } else if (this.state.userView !== -1) {
       return (
         <div>
@@ -80,6 +90,12 @@ class Post extends React.Component {
         </div>
       );
     }
+  }
+
+  async getProfilePage() {
+    const response = await fetch(`users/${this.state.userView}`);
+    const user = await response.json();
+    this.setState({ userViewUser: user });
   }
 
   newPost() {

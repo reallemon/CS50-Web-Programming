@@ -4,7 +4,17 @@ from django.db import models
 
 class User(AbstractUser):
     following = models.ManyToManyField("User", related_name="followers")
-    pass
+
+    def serialize(self):
+        followers = [{follower.id, follower.username} for follower in self.followers.all()]
+        following = [{follow.id, follow.username} for follow in self.following.all()]
+        return {
+            "id": self.id,
+            "username": self.username,
+            "followers": followers,
+            "following": following
+        }
+
 
 
 class Post(models.Model):

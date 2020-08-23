@@ -91,6 +91,13 @@ def display_posts(request):
     posts = Post.objects.all().order_by("-timestamp").all()
     return JsonResponse([post.serialize() for post in posts], safe=False)
 
+def user_info(request, user_id):
+    user = User.objects.get(pk=user_id)
+    if request.method == "PUT":
+        pass
+    
+    return JsonResponse(user.serialize(), safe=False)
+
 @login_required
 def like_post(request, post_id):
     post = Post.objects.get(pk=post_id)
