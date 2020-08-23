@@ -29,6 +29,7 @@ class Post extends React.Component {
       posts: [],
       currentPage: 1,
       postsPerPage: 10,
+      userView: -1
     };
 
     // Load existing posts
@@ -71,14 +72,22 @@ class Post extends React.Component {
   pagination() {
     const indexOfLastPost = this.state.currentPage * this.state.postsPerPage;
     const indexOfFirstPost = indexOfLastPost - this.state.postsPerPage;
-    const currentPosts = this.state.posts.slice(
+
+    let userPosts = []
+    if(this.state.userView === -1) {
+        userPosts = this.state.posts;
+    } else {
+        userPosts = this.state.posts.filter(post => post.user.id == this.state.userView)
+    }
+
+    const currentPosts = userPosts.slice(
       indexOfFirstPost,
       indexOfLastPost
     );
     const pageNumbers = [];
     for (
       let i = 1;
-      i <= Math.ceil(this.state.posts.length / this.state.postsPerPage);
+      i <= Math.ceil(userPosts.length / this.state.postsPerPage);
       i++
     ) {
       pageNumbers.push(i);
@@ -94,8 +103,6 @@ class Post extends React.Component {
             >
               <div className="ml-5">
                 <h2>{post.user.username}</h2>
-                {/* {this.canEdit(post.user.id)}
-                <p className="py-1">{post.text}</p> */}
                 {this.postText(post)}
                 <p>
                   <small className="text-muted">{post.timestamp}</small>
@@ -125,7 +132,7 @@ class Post extends React.Component {
                 </a>
               </li>
             ))}
-            {this.isLastPage()}
+            {this.isLastPage(userPosts)}
           </ul>
         </nav>
       </div>
@@ -235,10 +242,10 @@ class Post extends React.Component {
     }
   }
 
-  isLastPage() {
+  isLastPage(posts) {
     if (
       this.state.currentPage !==
-      Math.ceil(this.state.posts.length / this.state.postsPerPage)
+      Math.ceil(this.state.posts.length / this.state.postsPerPage) && posts.length > this.state.postsPerPage
     ) {
       return (
         <li className="page-item">
