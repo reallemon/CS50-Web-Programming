@@ -30,6 +30,7 @@ class Post extends React.Component {
       currentPage: 1,
       postsPerPage: 10,
       userView: -1,
+      userViewName: null,
     };
 
     // Load existing posts
@@ -40,12 +41,45 @@ class Post extends React.Component {
   render() {
     return (
       <div>
+        {this.profilePage()}
         {this.newPost()}
         <div className="row">
           <div className="col-sm-12">{this.pagination()}</div>
         </div>
       </div>
     );
+  }
+
+  profilePage() {
+    if (this.state.userView != -1 && this.state.userViewName) {
+      return (
+        <div>
+          <div className="row">
+            <div className="col-sm-12">
+              <h1>{this.state.userViewName}</h1>
+            </div>
+          </div>
+          <div className="row">
+            <div className="col-sm-6">
+              <small>{window.django.user.followers} followers</small>
+            </div>
+            <div className="col-sm-6">
+              <small>Following {window.django.user.following} people.</small>
+            </div>
+          </div>
+        </div>
+      );
+    } else if (this.state.userView !== -1) {
+      return (
+        <div>
+          <div className="row">
+            <div className="col-sm-12">
+              <h1>Sorry, that user doesn't exist.</h1>
+            </div>
+          </div>
+        </div>
+      );
+    }
   }
 
   newPost() {
@@ -115,7 +149,9 @@ class Post extends React.Component {
                 <h2>
                   <a
                     href="#!"
-                    onClick={() => this.changeUserView(post.user.id)}
+                    onClick={() =>
+                      this.changeUserView(post.user.id, post.user.username)
+                    }
                   >
                     {post.user.username}
                   </a>
@@ -156,9 +192,10 @@ class Post extends React.Component {
     );
   }
 
-  changeUserView(id) {
+  changeUserView(id, name) {
     this.setState({
       userView: id,
+      userViewName: name,
     });
   }
 
