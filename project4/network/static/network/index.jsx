@@ -29,7 +29,7 @@ class Post extends React.Component {
       posts: [],
       currentPage: 1,
       postsPerPage: 10,
-      userView: -1
+      userView: -1,
     };
 
     // Load existing posts
@@ -40,6 +40,20 @@ class Post extends React.Component {
   render() {
     return (
       <div>
+        {this.newPost()}
+        <div className="row">
+          <div className="col-sm-12">{this.pagination()}</div>
+        </div>
+      </div>
+    );
+  }
+
+  newPost() {
+    if (
+      this.state.userView === -1 ||
+      this.state.userView === parseInt(window.django.user.id)
+    ) {
+      return (
         <div className="row">
           <div className="col-sm-12">
             <form onSubmit={this.submitHandler}>
@@ -62,28 +76,24 @@ class Post extends React.Component {
             </form>
           </div>
         </div>
-        <div className="row">
-          <div className="col-sm-12">{this.pagination()}</div>
-        </div>
-      </div>
-    );
+      );
+    }
   }
 
   pagination() {
     const indexOfLastPost = this.state.currentPage * this.state.postsPerPage;
     const indexOfFirstPost = indexOfLastPost - this.state.postsPerPage;
 
-    let userPosts = []
-    if(this.state.userView === -1) {
-        userPosts = this.state.posts;
+    let userPosts = [];
+    if (this.state.userView === -1) {
+      userPosts = this.state.posts;
     } else {
-        userPosts = this.state.posts.filter(post => post.user.id == this.state.userView)
+      userPosts = this.state.posts.filter(
+        (post) => post.user.id == this.state.userView
+      );
     }
 
-    const currentPosts = userPosts.slice(
-      indexOfFirstPost,
-      indexOfLastPost
-    );
+    const currentPosts = userPosts.slice(indexOfFirstPost, indexOfLastPost);
     const pageNumbers = [];
     for (
       let i = 1;
@@ -147,9 +157,9 @@ class Post extends React.Component {
   }
 
   changeUserView(id) {
-      this.setState({
-          userView: id
-      });
+    this.setState({
+      userView: id,
+    });
   }
 
   postText(post) {
@@ -179,32 +189,32 @@ class Post extends React.Component {
     );
   }
 
-  saveEdit(postId){
-      let post = this.state.posts.find((obj) => obj["id"] === postId);
-      if(post.text != "\n" && post.text.length > 0) {
-          fetch(`posts/${postId}`, {
-              method: "PUT",
-              headers: {
-                  "X-CSRFToken": window.django.csrf,
-                },
-                body: JSON.stringify({
-                    text: post.text,
-                }),
-            });
-            this.changeEdit(postId);
-            this.getNewPosts();
-        }
+  saveEdit(postId) {
+    let post = this.state.posts.find((obj) => obj["id"] === postId);
+    if (post.text != "\n" && post.text.length > 0) {
+      fetch(`posts/${postId}`, {
+        method: "PUT",
+        headers: {
+          "X-CSRFToken": window.django.csrf,
+        },
+        body: JSON.stringify({
+          text: post.text,
+        }),
+      });
+      this.changeEdit(postId);
+      this.getNewPosts();
+    }
   }
 
   editComment(event, postId) {
-      if(event.target.value != "\n" ){
-          let postIndex = this.state.posts.findIndex((obj) => obj["id"] === postId);
-          let posts = [...this.state.posts];
-          let post = { ...posts[postIndex] };
-          post.text = event.target.value;
-          posts[postIndex] = post;
-          this.setState({ posts });
-        }
+    if (event.target.value != "\n") {
+      let postIndex = this.state.posts.findIndex((obj) => obj["id"] === postId);
+      let posts = [...this.state.posts];
+      let post = { ...posts[postIndex] };
+      post.text = event.target.value;
+      posts[postIndex] = post;
+      this.setState({ posts });
+    }
   }
 
   changeEdit(postId) {
@@ -258,7 +268,8 @@ class Post extends React.Component {
   isLastPage(posts) {
     if (
       this.state.currentPage !==
-      Math.ceil(this.state.posts.length / this.state.postsPerPage) && posts.length > this.state.postsPerPage
+        Math.ceil(this.state.posts.length / this.state.postsPerPage) &&
+      posts.length > this.state.postsPerPage
     ) {
       return (
         <li className="page-item">
