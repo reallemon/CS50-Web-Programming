@@ -94,12 +94,13 @@ class Post extends React.Component {
             >
               <div className="ml-5">
                 <h2>{post.user.username}</h2>
-                {this.canEdit(post.user.id)}
-                <p className="pb-1">{post.text}</p>
+                {/* {this.canEdit(post.user.id)}
+                <p className="py-1">{post.text}</p> */}
+                {this.postText(post)}
                 <p>
                   <small className="text-muted">{post.timestamp}</small>
                 </p>
-                <a href="#!" onClick={ () => this.likePost(post.id)}>
+                <a href="#!" onClick={() => this.likePost(post.id)}>
                   {this.likeOrNot(post.likes)} {post.likes.length}
                 </a>
               </div>
@@ -131,12 +132,74 @@ class Post extends React.Component {
     );
   }
 
+  postText(post) {
+    if (post.editable) {
+      return (
+        <div>
+          <a href="#!" onClick={() => this.saveEdit(post.id)}>
+            Save
+          </a>
+          <form onSubmit={this.submitHandler}>
+            <textarea
+              className="form-control"
+              onChange={(e) => this.editComment(e, post.id)}
+              value={post.text}
+            ></textarea>
+          </form>
+        </div>
+      );
+    }
+    return (
+      <div>
+        <a href="#!" onClick={() => this.changeEdit(post.id)}>
+          {this.canEdit(post.user.id)}
+        </a>
+        <p className="py-1">{post.text}</p>
+      </div>
+    );
+  }
+
+  saveEdit(postId){
+      let post = this.state.posts.find((obj) => obj["id"] === postId);
+      if(post.text != "\n" && post.text.length > 0) {
+          fetch(`posts/${postId}`, {
+              method: "PUT",
+              headers: {
+                  "X-CSRFToken": window.django.csrf,
+                },
+                body: JSON.stringify({
+                    text: post.text,
+                }),
+            });
+            this.changeEdit(postId);
+            this.getNewPosts();
+        }
+  }
+
+  editComment(event, postId) {
+      if(event.target.value != "\n" ){
+          let postIndex = this.state.posts.findIndex((obj) => obj["id"] === postId);
+          let posts = [...this.state.posts];
+          let post = { ...posts[postIndex] };
+          post.text = event.target.value;
+          posts[postIndex] = post;
+          this.setState({ posts });
+        }
+  }
+
+  changeEdit(postId) {
+    let postIndex = this.state.posts.findIndex((obj) => obj["id"] === postId);
+    let posts = [...this.state.posts];
+    let post = { ...posts[postIndex] };
+    post.editable = !post.editable;
+    posts[postIndex] = post;
+    this.setState({ posts });
+  }
+
   canEdit(postUserId) {
-      if(postUserId === parseInt(window.django.user.id)) {
-          return(
-              <small>Edit</small>
-          )
-      }
+    if (postUserId === parseInt(window.django.user.id)) {
+      return <small>Edit</small>;
+    }
   }
 
   likePost(id) {
@@ -149,7 +212,7 @@ class Post extends React.Component {
         liked: "toggle",
       }),
     });
-    this.getNewPosts()
+    this.getNewPosts();
   }
 
   isFirstPage() {
@@ -198,9 +261,9 @@ class Post extends React.Component {
   likeOrNot(likes) {
     const likesObject = Object.fromEntries(likes);
     if (Object.values(likesObject).includes(parseInt(window.django.user.id))) {
-        return <span className="hearts">&hearts;</span>;
+      return <span className="hearts">&hearts;</span>;
     } else {
-        return <span className="hearts">&#9825;</span>;
+      return <span className="hearts">&#9825;</span>;
     }
   }
 

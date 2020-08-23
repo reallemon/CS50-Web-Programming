@@ -20,7 +20,8 @@ class Post(models.Model):
             "timestamp": self.timestamp.strftime("%b %d %Y, %I:%M %p"),
             "user": {"username": self.user.username, "id": self.user.id},
             "text": self.text,
-            "likes": likes
+            "likes": likes,
+            "editable": False
         }
 
     def __str__(self):

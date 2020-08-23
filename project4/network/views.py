@@ -101,6 +101,8 @@ def like_post(request, post_id):
                 post.likes.remove(request.user)
             else:
                 post.likes.add(request.user)
+        elif data.get("text") is not None:
+            post.text = data.get("text")
                     
         post.save()
         time.sleep(.1)
